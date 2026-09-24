@@ -780,6 +780,168 @@ body.lightbox-open { overflow: hidden; }
 }
 
 /* ==========================================================================
+   Splash — once per session, skippable, hides itself even without JS
+   ========================================================================== */
+.splash { display: none; }
+html.is-splash .splash {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  cursor: pointer;
+  animation: splash-gone 0s linear 2.7s forwards;
+}
+.splash-panel {
+  position: absolute;
+  left: 0; right: 0;
+  height: calc(50% + 1px);
+  background: #050505;
+  will-change: transform;
+}
+.splash-panel--top { top: 0; animation: splash-open-up 0.75s cubic-bezier(0.76, 0, 0.24, 1) 1.85s forwards; }
+.splash-panel--bottom { bottom: 0; animation: splash-open-down 0.75s cubic-bezier(0.76, 0, 0.24, 1) 1.85s forwards; }
+
+.splash-stage { position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; }
+.splash-stage::before {
+  content: '';
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 140vmax; height: 70vmax;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.07), transparent);
+  animation: splash-fade-out 0.3s ease 1.55s forwards;
+}
+
+.splash-streaks span {
+  position: absolute;
+  left: 0;
+  width: 45vw;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  opacity: 0;
+  animation: splash-streak 0.9s cubic-bezier(0.5, 0, 0.2, 1) forwards;
+}
+.splash-streaks span:nth-child(1) { top: 32%; animation-delay: 0.05s; }
+.splash-streaks span:nth-child(2) { top: 64%; width: 60vw; animation-delay: 0.22s; }
+.splash-streaks span:nth-child(3) { top: 71%; width: 30vw; animation-delay: 0.4s; }
+
+.splash-logo {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: calc(50% + 30px);
+  width: min(300px, 62vw);
+  margin-inline: auto;
+  animation: splash-rise-out 0.35s ease-in 1.55s forwards;
+}
+/* Headlight sweep: a soft-edged mask slides left to right over the wordmark */
+.splash-logo img {
+  width: 100%;
+  opacity: 0.82;
+  filter: drop-shadow(0 0 22px rgba(255, 255, 255, 0.18));
+  -webkit-mask-image: linear-gradient(90deg, #000 42%, transparent 58%);
+  mask-image: linear-gradient(90deg, #000 42%, transparent 58%);
+  -webkit-mask-size: 260% 100%;
+  mask-size: 260% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: 100% 0;
+  mask-position: 100% 0;
+  animation: splash-reveal 1s cubic-bezier(0.22, 1, 0.36, 1) 0.15s forwards;
+}
+/* Glint clipped to the letter shapes via the logo itself as mask */
+.splash-shine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 40%, #fff 50%, transparent 60%) no-repeat;
+  background-size: 250% 100%;
+  background-position: 120% 0;
+  -webkit-mask-image: var(--logo);
+  mask-image: var(--logo);
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  animation: splash-shine 0.8s ease-in-out 1s forwards;
+}
+
+.splash-bar {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: min(240px, 56vw);
+  height: 1px;
+  background: rgba(255, 255, 255, 0.14);
+  transform: translate(-50%, -50%);
+  animation:
+    splash-bar-expand 0.35s cubic-bezier(0.65, 0, 0.35, 1) 1.5s forwards,
+    splash-fade-out 0.3s ease 1.95s forwards;
+}
+.splash-bar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.35), #fff 18%, #fff 82%, rgba(255, 255, 255, 0.35));
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: splash-load 1.15s cubic-bezier(0.65, 0, 0.35, 1) 0.3s forwards;
+}
+
+.splash-caption {
+  position: absolute;
+  left: 0; right: 0;
+  top: calc(50% + 22px);
+  margin: 0;
+  padding: 0 1rem 0 calc(1rem + 0.42em);
+  text-align: center;
+  font-size: 0.68rem;
+  font-weight: 400;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--taupe-light);
+  opacity: 0;
+  animation:
+    splash-caption-in 0.8s ease 0.6s forwards,
+    splash-rise-out 0.35s ease-in 1.55s forwards;
+}
+
+html.is-splash .splash.is-skipping { animation: splash-gone-skip 0s linear 0.6s forwards; }
+.splash.is-skipping .splash-stage { animation: splash-fade-out 0.2s ease forwards; }
+/* Distinct names on purpose: reusing splash-open-* would keep the running animation's clock and jump mid-way */
+.splash.is-skipping .splash-panel--top { animation: splash-skip-up 0.55s cubic-bezier(0.76, 0, 0.24, 1) forwards; }
+.splash.is-skipping .splash-panel--bottom { animation: splash-skip-down 0.55s cubic-bezier(0.76, 0, 0.24, 1) forwards; }
+
+@keyframes splash-gone { to { visibility: hidden; } }
+@keyframes splash-gone-skip { to { visibility: hidden; } }
+@keyframes splash-open-up { to { transform: translateY(-100%); } }
+@keyframes splash-open-down { to { transform: translateY(100%); } }
+@keyframes splash-skip-up { to { transform: translateY(-100%); } }
+@keyframes splash-skip-down { to { transform: translateY(100%); } }
+@keyframes splash-fade-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes splash-rise-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(-10px); } }
+@keyframes splash-streak {
+  0% { opacity: 0; transform: translateX(-60vw); }
+  15% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(160vw); }
+}
+@keyframes splash-reveal { to { -webkit-mask-position: 0 0; mask-position: 0 0; } }
+@keyframes splash-shine { from { background-position: 120% 0; } to { background-position: -20% 0; } }
+@keyframes splash-load { to { transform: scaleX(1); } }
+@keyframes splash-bar-expand { to { width: 100vw; } }
+@keyframes splash-caption-in {
+  from { opacity: 0; letter-spacing: 0.7em; }
+  to { opacity: 1; letter-spacing: 0.42em; }
+}
+
+/* Hero entrance, only right after the splash doors open */
+html.hero-reveal .hero-media img { animation: hero-zoom 2.2s cubic-bezier(0.22, 1, 0.36, 1) both; }
+html.hero-reveal .hero-content > * { animation: hero-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both; }
+html.hero-reveal .hero-content > :nth-child(2) { animation-delay: 0.08s; }
+html.hero-reveal .hero-content > :nth-child(3) { animation-delay: 0.16s; }
+html.hero-reveal .hero-content > :nth-child(4) { animation-delay: 0.24s; }
+html.hero-reveal .hero-content > :nth-child(5) { animation-delay: 0.32s; }
+@keyframes hero-zoom { from { transform: scale(1.08); } }
+@keyframes hero-rise { from { opacity: 0; transform: translateY(22px); } }
+
+/* ==========================================================================
    Responsive
    ========================================================================== */
 @media (max-width: 1024px) {

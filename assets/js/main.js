@@ -6,6 +6,44 @@ document.addEventListener('DOMContentLoaded', function () {
   var mobile = window.matchMedia('(max-width: 768px)');
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
+  /* ---------------- Splash (shown by the inline <head> script, once per session) ---------------- */
+  var root = document.documentElement;
+  var splash = document.querySelector('.splash');
+  if (splash && root.classList.contains('is-splash')) {
+    var door = splash.querySelector('.splash-panel--bottom');
+    var doorAnim = door.getAnimations ? door.getAnimations()[0] : null;
+    var t0 = performance.now();
+    var elapsed = function () {
+      return doorAnim && doorAnim.currentTime !== null ? doorAnim.currentTime : performance.now() - t0;
+    };
+    var finished = false;
+    var revealHero = function () { root.classList.add('hero-reveal'); };
+    var revealTimer = setTimeout(revealHero, Math.max(0, 1850 - elapsed()));
+    var skipEvents = ['wheel', 'touchmove', 'keydown'];
+
+    var finish = function () {
+      if (finished) { return; }
+      finished = true;
+      clearTimeout(revealTimer);
+      revealHero();
+      splash.remove();
+      root.classList.remove('is-splash');
+      skipEvents.forEach(function (type) { window.removeEventListener(type, skip); });
+    };
+    var skip = function () {
+      if (finished || splash.classList.contains('is-skipping') || elapsed() > 1750) { return; }
+      clearTimeout(revealTimer);
+      revealHero();
+      splash.classList.add('is-skipping');
+      setTimeout(finish, 650);
+    };
+
+    door.addEventListener('animationend', finish);
+    splash.addEventListener('pointerdown', skip);
+    skipEvents.forEach(function (type) { window.addEventListener(type, skip, { passive: true }); });
+    setTimeout(finish, Math.max(0, 3200 - elapsed()));
+  }
+
   function onFrame(fn) {
     var ticking = false;
     return function () {

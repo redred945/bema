@@ -10,9 +10,25 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script>try{if(!sessionStorage.getItem('bema-splash')&&!matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('is-splash');sessionStorage.setItem('bema-splash','1')}}catch(e){}</script>
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
+
+<div class="splash" aria-hidden="true">
+  <div class="splash-panel splash-panel--top"></div>
+  <div class="splash-panel splash-panel--bottom"></div>
+  <div class="splash-stage">
+    <div class="splash-streaks"><span></span><span></span><span></span></div>
+    <div class="splash-logo" style="--logo: url('assets/images/brand/bema-vitesse.webp')">
+      <img src="assets/images/brand/bema-vitesse.webp" alt="" width="600" height="234">
+      <span class="splash-shine"></span>
+    </div>
+    <div class="splash-bar"><span></span></div>
+    <p class="splash-caption">V12 is the therapy you need</p>
+  </div>
+</div>
+
 
 <header class="site-header">
   <div class="header-inner">

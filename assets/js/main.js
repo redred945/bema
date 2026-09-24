@@ -217,14 +217,25 @@ document.addEventListener('DOMContentLoaded', function () {
       if (!lightbox.classList.contains('is-open')) { return; }
       lightbox.classList.remove('is-open');
       body.classList.remove('lightbox-open');
+      if (returnFocus) { returnFocus.focus({ preventScroll: true }); returnFocus = null; }
       if (pushedState) {
         pushedState = false;
         if (!fromHistory) { history.back(); }
       }
     }
 
+    var returnFocus = null;
     document.querySelectorAll('[data-lightbox]').forEach(function (item) {
       item.addEventListener('click', function () { open(item); });
+      item.setAttribute('tabindex', '0');
+      item.setAttribute('role', 'button');
+      item.addEventListener('keydown', function (e) {
+        if (lightbox.classList.contains('is-open') || (e.key !== 'Enter' && e.key !== ' ')) { return; }
+        e.preventDefault();
+        open(item);
+        returnFocus = item;
+        if (lbClose) { lbClose.focus({ preventScroll: true }); }
+      });
     });
     lbPrev.addEventListener('click', function () { show(index - 1); });
     lbNext.addEventListener('click', function () { show(index + 1); });
@@ -301,5 +312,82 @@ document.addEventListener('DOMContentLoaded', function () {
     card.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); }
     });
+  });
+
+  /* ---------------- Finishing touches: image fade-in, reveal on scroll, count-up ---------------- */
+  if (reduceMotion.matches) { return; }
+
+  // Photos fade in once loaded; anything already loaded is never hidden (logos and hero excluded)
+  document.querySelectorAll('.universe-card > img, .team-photo img, .gallery-item img, .carousel-slide img, .feature-media img, .event-media img').forEach(function (img) {
+    if (img.complete) { return; }
+    img.classList.add('img-pending');
+    function done() { img.classList.remove('img-pending'); img.classList.add('img-in'); }
+    img.addEventListener('load', done, { once: true });
+    img.addEventListener('error', done, { once: true });
+  });
+
+  if (!('IntersectionObserver' in window)) { return; }
+
+  // Only what starts below the fold: content already on screen is never hidden after the fact
+  var fold = window.innerHeight;
+  var belowFold = function (el) { return el.getBoundingClientRect().top > fold; };
+
+  var staggerSel = '.universe-grid, .team-grid, .testimonial-grid, .gallery-grid, .service-grid, .mascot-block, .timeline, .entity-select-grid, .grid-2, .grid-3, .feature-row, .stats-bar';
+  var revealEls = Array.prototype.filter.call(document.querySelectorAll(
+    'main > .section > .container:not(.legal-content) > :not(.slider-progress), main > .stats-bar, .cta-band-inner > *'
+  ), belowFold);
+  var revealIO = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      // Still below the viewport: wait. Intersecting, or already scrolled past: show.
+      if (!entry.isIntersecting && entry.boundingClientRect.top > 0) { return; }
+      entry.target.classList.add('is-in');
+      revealIO.unobserve(entry.target);
+    });
+  }, { rootMargin: '0px 0px -8% 0px' });
+  revealEls.forEach(function (el) {
+    el.classList.add('reveal');
+    if (el.matches(staggerSel)) {
+      el.classList.add('reveal--stagger');
+      Array.prototype.forEach.call(el.children, function (child, i) {
+        child.style.setProperty('--reveal-i', Math.min(i, 6));
+      });
+    }
+    revealIO.observe(el);
+  });
+
+  // Stats count up once; a hidden copy of the final value keeps the width steady
+  var countIO = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) { return; }
+      countIO.unobserve(entry.target);
+      entry.target.bemaCount();
+    });
+  }, { threshold: 0.6 });
+  Array.prototype.filter.call(document.querySelectorAll('.stats-bar .stat-number'), belowFold).forEach(function (el) {
+    var original = el.textContent;
+    var m = original.match(/^(\D*)(\d+)(.*)$/);
+    if (!m) { return; }
+    var target = parseInt(m[2], 10);
+    var wrap = document.createElement('span');
+    var live = document.createElement('span');
+    var ghost = document.createElement('span');
+    wrap.className = 'stat-count';
+    live.className = 'stat-count-live';
+    ghost.className = 'stat-count-final';
+    live.textContent = '0';
+    ghost.textContent = m[2];
+    wrap.append(live, ghost);
+    el.textContent = m[1];
+    el.append(wrap, m[3]);
+    el.bemaCount = function () {
+      var start = null;
+      requestAnimationFrame(function frame(now) {
+        if (start === null) { start = now; }
+        var t = Math.min((now - start) / 1400, 1);
+        live.textContent = Math.round(target * (1 - Math.pow(1 - t, 4)));
+        if (t < 1) { requestAnimationFrame(frame); } else { el.textContent = original; }
+      });
+    };
+    countIO.observe(el);
   });
 });

@@ -59,7 +59,9 @@ ul { margin: 0; padding: 0; list-style: none; }
 .section--dark { background: var(--black-2); }
 
 .eyebrow {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
   font-size: 0.72rem;
   letter-spacing: 0.28em;
   text-transform: uppercase;
@@ -67,6 +69,17 @@ ul { margin: 0; padding: 0; list-style: none; }
   margin-bottom: 1.2rem;
   font-weight: 400;
 }
+/* Editorial hairline; centred eyebrows get one on each side (the -0.28em eats the trailing letter-spacing) */
+.eyebrow::before,
+:is(.section-head--center, .text-center, .hero-content, .cta-band) .eyebrow::after {
+  content: '';
+  flex: 0 0 24px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.65;
+}
+:is(.section-head--center, .text-center, .hero-content, .cta-band) .eyebrow { justify-content: center; }
+:is(.section-head--center, .text-center, .hero-content, .cta-band) .eyebrow::after { margin-left: -0.28em; }
 
 h1, h2, h3 { margin: 0 0 1rem; }
 
@@ -312,14 +325,42 @@ body.menu-open { overflow: hidden; }
 .hero--small { min-height: 68vh; min-height: 68svh; }
 .scroll-cue {
   position: absolute;
-  bottom: 2rem;
+  bottom: 1.6rem;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 0.65rem;
-  letter-spacing: 0.25em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
   text-transform: uppercase;
   color: var(--taupe);
   z-index: 1;
+  pointer-events: none;
+}
+.scroll-cue-label { padding-left: 0.3em; }
+/* Hairline with a soft drop of light sliding down, on a slow loop */
+.scroll-cue-line {
+  position: relative;
+  width: 1px;
+  height: 56px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.14);
+}
+.scroll-cue-line::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 0;
+  width: 1px;
+  height: 45%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0), #fff);
+  transform: translateY(-100%);
+  animation: cue-drop 2.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+@keyframes cue-drop {
+  0% { transform: translateY(-100%); }
+  75%, 100% { transform: translateY(225%); }
 }
 
 /* ---------------- Universe grid (Home) ---------------- */
@@ -383,11 +424,18 @@ body.menu-open { overflow: hidden; }
 }
 .stat:last-child { border-right: none; }
 .stat-number {
+  display: block;
   font-size: 2.4rem;
   font-weight: 600;
   letter-spacing: 0.01em;
   margin-bottom: 0.5rem;
+  font-variant-numeric: tabular-nums;
 }
+/* Count-up: an invisible copy of the final value reserves the width, digits stay anchored right */
+.stat-count { display: inline-grid; }
+.stat-count > * { grid-area: 1 / 1; }
+.stat-count-live { justify-self: end; }
+.stat-count-final { visibility: hidden; }
 .stat-label {
   font-size: 0.72rem;
   text-transform: uppercase;
@@ -1073,6 +1121,8 @@ html.hero-reveal .hero-content > :nth-child(5) { animation-delay: 0.32s; }
     overflow: hidden;
   }
   .slider-progress[hidden] { display: none; }
+  html.js .reveal:not(.is-in) + .slider-progress { opacity: 0; }
+  .slider-progress { transition: opacity 0.8s var(--ease) 0.2s; }
   .slider-progress span {
     display: block;
     height: 100%;
@@ -1106,4 +1156,174 @@ html.hero-reveal .hero-content > :nth-child(5) { animation-delay: 0.32s; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+
+/* ==========================================================================
+   Finitions — transitions, reveal, grain, CTA band, conciergerie, signature
+   ========================================================================== */
+
+/* ---------------- Page transitions (cross-document View Transitions, CSS only) ---------------- */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+}
+/* No view-transition-name on the header: it would make it a backdrop root and kill its blur.
+   The header is identical on every page, so the root cross-fade already reads as static. */
+::view-transition-old(root) { animation: vt-fade-out 0.3s cubic-bezier(0.22, 1, 0.36, 1) both; }
+::view-transition-new(root) { animation: vt-fade-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes vt-fade-out { to { opacity: 0; } }
+@keyframes vt-fade-in { from { opacity: 0; } }
+
+/* ---------------- Reveal on scroll (classes set by main.js, never without JS) ---------------- */
+@keyframes reveal-up { from { opacity: 0; transform: translateY(16px); } }
+@keyframes img-in { from { opacity: 0; } }
+/* Hidden state is opacity only: changing the base transform would fire existing transform
+   transitions (e.g. .entity-select-card), which outrank animations. The 16px offset comes
+   from the keyframes alone, and the backwards fill leaves hover transforms untouched after. */
+@media screen and (prefers-reduced-motion: no-preference) {
+  html.js .reveal:not(.is-in) { opacity: 0; }
+  html.js .reveal.is-in { animation: reveal-up 0.8s var(--ease) backwards; }
+  html.js img.img-pending { opacity: 0; }
+  html.js img.img-in { animation: img-in 0.7s var(--ease) backwards; }
+}
+/* Desktop: grids reveal child by child; mobile keeps the whole row as one block */
+@media screen and (prefers-reduced-motion: no-preference) and (min-width: 769px) {
+  html.js .reveal--stagger:not(.is-in) { opacity: 1; }
+  html.js .reveal--stagger.is-in { animation: none; }
+  html.js .reveal--stagger:not(.is-in) > * { opacity: 0; }
+  html.js .reveal--stagger.is-in > * { animation: reveal-up 0.8s var(--ease) backwards; animation-delay: calc(var(--reveal-i, 0) * 90ms); }
+}
+
+/* ---------------- Film grain: static SVG noise, no blend mode, above content, below header/menu/lightbox/splash ---------------- */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='2 0 0 0 -0.5 2 0 0 0 -0.5 2 0 0 0 -0.5 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 220px 220px;
+}
+@media (forced-colors: active) { body::after { display: none; } }
+
+/* ---------------- Details ---------------- */
+::selection { background: var(--white); color: var(--black); }
+
+:focus-visible { outline: 1px solid var(--white); outline-offset: 4px; }
+.gallery-item:focus-visible { outline-offset: -4px; }
+.menu-toggle:focus-visible { outline-offset: 3px; }
+
+@media (hover: hover) and (pointer: fine) {
+  html { scrollbar-width: thin; scrollbar-color: #3a3a3a var(--black); }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: var(--black); }
+  ::-webkit-scrollbar-thumb { background: #333; border: 2px solid var(--black); border-radius: 10px; }
+  ::-webkit-scrollbar-thumb:hover { background: #4a4a4a; }
+
+  .team-photo img { filter: grayscale(0.35); transition: filter 0.6s var(--ease); }
+  .team-member:hover .team-photo img { filter: grayscale(0); }
+}
+
+/* ---------------- Closing CTA band ---------------- */
+.cta-band {
+  position: relative;
+  padding: 7rem 0;
+  text-align: center;
+  border-top: 1px solid var(--border-soft);
+  background: radial-gradient(120% 100% at 50% 0%, #171717 0%, #0b0b0b 62%);
+}
+.cta-band::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  width: 1px; height: 64px;
+  background: linear-gradient(180deg, var(--taupe), rgba(141, 133, 133, 0));
+}
+.cta-band h2 {
+  max-width: 16em;
+  margin: 0 auto 2.4rem;
+  font-size: clamp(1.7rem, 1rem + 3vw, 3.2rem);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+.cta-band-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+.cta-band-note {
+  margin: 1.8rem 0 0;
+  padding-left: 0.16em;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--taupe);
+}
+
+/* ---------------- Menu: conciergerie ---------------- */
+.panel-concierge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
+  color: var(--taupe);
+  text-align: center;
+}
+.panel-concierge-title {
+  margin-bottom: 0.35rem;
+  padding-left: 0.32em;
+  font-size: 0.62rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+}
+.panel-concierge a { color: var(--taupe-light); transition: color 0.25s var(--ease); }
+.panel-concierge a:hover { color: var(--white); }
+
+/* ---------------- Footer signature ---------------- */
+.footer-signature {
+  margin-top: 1.5rem;
+  pointer-events: none;
+  user-select: none;
+}
+.footer-signature img {
+  width: 100%;
+  opacity: 0.1;
+  -webkit-mask-image: linear-gradient(180deg, #000 15%, rgba(0, 0, 0, 0) 100%);
+  mask-image: linear-gradient(180deg, #000 15%, rgba(0, 0, 0, 0) 100%);
+}
+
+/* ---------------- BEMA Vitesse gallery: editorial lead image (desktop only) ---------------- */
+@media (min-width: 1025px) {
+  .gallery-grid--feature { grid-auto-flow: dense; }
+  .gallery-grid--feature > :first-child { grid-column: span 2; grid-row: span 2; aspect-ratio: auto; }
+  /* Out of flow so its portrait intrinsic height cannot stretch the two rows it spans */
+  .gallery-grid--feature > :first-child img { position: absolute; inset: 0; }
+}
+
+@media (max-width: 768px) {
+  .cta-band { padding: 4.5rem 0; }
+  .cta-band::before { height: 44px; }
+  .cta-band h2 { margin-bottom: 1.8rem; }
+  .scroll-cue { gap: 0.6rem; bottom: 1.25rem; }
+  .scroll-cue-line { height: 40px; }
+  .menu-panel-nav { gap: 1.6rem; }
+}
+@media (max-width: 480px) {
+  :is(.section-head--center, .text-center, .hero-content, .cta-band) .eyebrow::before,
+  :is(.section-head--center, .text-center, .hero-content, .cta-band) .eyebrow::after { flex-basis: 16px; }
+  .cta-band-actions { flex-direction: column; }
+  .cta-band-actions .btn-pill { width: 100%; }
+  .footer-signature { margin-top: 1rem; }
+}
+@media (max-height: 620px) and (max-width: 768px) {
+  .scroll-cue { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue-line::after { display: none; }
+}
+
+@media print {
+  body::after, .splash, .footer-signature { display: none; }
+  .reveal, .reveal > *, img.img-pending { opacity: 1 !important; transform: none !important; animation: none !important; }
 }

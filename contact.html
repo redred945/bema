@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — BEMA Groupe</title>
+<meta name="description" content="Contactez BEMA Groupe pour vos projets automobiles d'exception : Vitesse, Legends, Life, Bike ou Protect.">
+<link rel="icon" href="assets/images/brand/site_favicon_16_1779263088762.ico">
+<link rel="apple-touch-icon" href="assets/images/brand/android-chrome-192x192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="logo"><img src="assets/images/brand/BEMA_CLASSIQUE-1920w.png" alt="BEMA Groupe"></a>
+    <nav class="main-nav">
+      <a href="bema-vitesse.html">BEMA Vitesse</a>
+      <a href="bema-legends.html">BEMA Legends</a>
+      <a href="bema-life.html">BEMA Life</a>
+      <a href="bema-bike.html">BEMA Bike</a>
+      <a href="bema-protect.html">BEMA Protect</a>
+    </nav>
+    <button class="menu-toggle" aria-label="Ouvrir le menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="menu-panel">
+    <nav class="menu-panel-nav">
+      <div class="panel-group panel-group-universes">
+        <a href="bema-vitesse.html">BEMA Vitesse</a>
+        <a href="bema-legends.html">BEMA Legends</a>
+        <a href="bema-life.html">BEMA Life</a>
+        <a href="bema-bike.html">BEMA Bike</a>
+        <a href="bema-protect.html">BEMA Protect</a>
+      </div>
+      <div class="panel-divider"></div>
+      <div class="panel-group">
+        <a href="a-propos.html">Notre ADN</a>
+        <a href="nos-evenements.html">Nos évènements</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero hero--small">
+    <div class="hero-media">
+      <img src="assets/images/vitesse/DSC06482-1920w.jpg" alt="Showroom BEMA Groupe">
+    </div>
+    <div class="hero-content">
+      <span class="eyebrow">Contact</span>
+      <h1>Parlons de votre projet</h1>
+      <p class="lead">Nos équipes vous répondent rapidement, quel que soit votre univers de prédilection.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+
+      <div class="section-head section-head--center">
+        <span class="eyebrow">Quel univers vous correspond ?</span>
+        <h2>Sélectionnez votre entité</h2>
+      </div>
+      <div class="entity-select-grid">
+        <div class="entity-select-card" data-select-entity="BEMA Vitesse">
+          <img src="assets/images/brand/BEMA_VITESSE-1920w.png" alt="BEMA Vitesse">
+          <p>Supercars &amp; véhicules de sport</p>
+          <span class="tag-pill">Choisir</span>
+        </div>
+        <div class="entity-select-card" data-select-entity="BEMA Life">
+          <img src="assets/images/brand/BEMA_LIFE-1920w.png" alt="BEMA Life">
+          <p>Véhicules premium &amp; lifestyle</p>
+          <span class="tag-pill">Choisir</span>
+        </div>
+        <div class="entity-select-card" data-select-entity="BEMA Bike">
+          <img src="assets/images/brand/BEMA_BIKE-1920w.png" alt="BEMA Bike">
+          <p>Motos d'exception</p>
+          <span class="tag-pill">Choisir</span>
+        </div>
+        <div class="entity-select-card" data-select-entity="BEMA Protect">
+          <img src="assets/images/brand/BEMA_PROTECT-1920w.png" alt="BEMA Protect">
+          <p>Protection &amp; personnalisation</p>
+          <span class="tag-pill">Choisir</span>
+        </div>
+      </div>
+
+      <div class="contact-layout">
+        <div>
+          <div id="form-success" class="form-success">
+            Merci, votre message a bien été enregistré. Notre équipe vous recontactera dans les plus brefs délais.
+          </div>
+          <form id="contact-form" onsubmit="event.preventDefault();" novalidate>
+            <div class="grid-2">
+              <div class="form-field">
+                <label for="name">Nom</label>
+                <input type="text" id="name" name="name" required>
+              </div>
+              <div class="form-field">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" name="email" required>
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="form-field">
+                <label for="phone">Téléphone</label>
+                <input type="tel" id="phone" name="phone" required>
+              </div>
+              <div class="form-field">
+                <label for="project-select">Votre projet concerne</label>
+                <select id="project-select" name="project">
+                  <option value="">Sélectionnez un univers</option>
+                  <option value="BEMA Vitesse">BEMA Vitesse</option>
+                  <option value="BEMA Legends">BEMA Legends</option>
+                  <option value="BEMA Life">BEMA Life</option>
+                  <option value="BEMA Bike">BEMA Bike</option>
+                  <option value="BEMA Protect">BEMA Protect</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="message">Message</label>
+              <textarea id="message" name="message" required></textarea>
+            </div>
+            <button type="submit" class="btn-pill">Envoyer</button>
+            <p class="form-note">Les informations recueillies via ce formulaire sont destinées exclusivement à BEMA Groupe pour le traitement de votre demande, conformément à notre <a href="vie-privee.html" style="color:inherit;text-decoration:underline;">politique de confidentialité</a>. Conformément à la loi, vous pouvez également vous inscrire gratuitement sur la liste d'opposition au démarchage téléphonique Bloctel (bloctel.gouv.fr).</p>
+          </form>
+        </div>
+
+        <div class="contact-info-block">
+          <h3>Showroom BEMA Vitesse / Legends / Bike / Protect</h3>
+          <p>4 rue Diderot<br>91240 Saint-Michel-sur-Orge</p>
+
+          <h3>Showroom BEMA Life</h3>
+          <p>82 avenue Carnot<br>94100 Saint-Maur-des-Fossés</p>
+
+          <h3>Horaires</h3>
+          <p>Lundi — Samedi : 10h — 20h<br>Dimanche : Fermé</p>
+
+          <h3>E-mail</h3>
+          <p><a href="mailto:sales@bemavitesse.fr" style="text-decoration:underline;">sales@bemavitesse.fr</a></p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>Nos entités</h4>
+        <a href="bema-vitesse.html">BEMA Vitesse</a>
+        <a href="bema-legends.html">BEMA Legends</a>
+        <a href="bema-life.html">BEMA Life</a>
+        <a href="bema-bike.html">BEMA Bike</a>
+        <a href="bema-protect.html">BEMA Protect</a>
+      </div>
+      <div class="footer-col">
+        <h4>Showrooms</h4>
+        <p>4 rue Diderot<br>91240 Saint-Michel-sur-Orge</p>
+        <p>82 avenue Carnot<br>94100 Saint-Maur-des-Fossés</p>
+      </div>
+      <div class="footer-col">
+        <h4>Horaires</h4>
+        <p>Lundi — Samedi<br>10h — 20h</p>
+        <p>Dimanche<br>Fermé</p>
+      </div>
+      <div class="footer-col">
+        <h4>Réseaux</h4>
+        <a href="https://facebook.com/profile.php?id=61575716664683" target="_blank" rel="noopener">Facebook</a>
+        <a href="https://instagram.com/bema_fr/" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://youtube.com/@bema_fr" target="_blank" rel="noopener">YouTube</a>
+        <a href="https://linkedin.com/company/bemavitesse" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <a href="contact.html">Nous contacter</a>
+        <a href="mailto:sales@bemavitesse.fr">sales@bemavitesse.fr</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 BEMA Groupe</p>
+      <div class="footer-legal-links">
+        <a href="mentions-legales.html">Mentions légales</a>
+        <a href="vie-privee.html">Vie privée</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>
